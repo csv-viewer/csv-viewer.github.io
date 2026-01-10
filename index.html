@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- ===== SEO META ===== -->
+<title>Online CSV Viewer & Editor – Edit, Convert CSV to Excel & PDF</title>
+<meta name="description" content="Free online CSV viewer and editor. Open, edit and convert CSV files to Excel or PDF instantly. 100% client-side, secure and offline capable." />
+<meta name="keywords" content="csv viewer online, edit csv online, csv to excel, csv to pdf, csv editor, open csv file online" />
+<meta name="robots" content="index, follow" />
+<meta name="author" content="Your Brand Name" />
+<link rel="canonical" href="https://yourdomain.com/csv-viewer" />
+
+<!-- ===== OPEN GRAPH ===== -->
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Online CSV Viewer & Editor – Edit & Convert CSV Files" />
+<meta property="og:description" content="View, edit and convert CSV files to Excel or PDF online. Fully client-side, private and fast." />
+<meta property="og:url" content="https://yourdomain.com/csv-viewer" />
+<meta property="og:image" content="https://yourdomain.com/assets/csv-viewer-preview.png" />
+
+<!-- ===== TWITTER ===== -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Online CSV Viewer & Editor" />
+<meta name="twitter:description" content="Edit and convert CSV files to Excel or PDF online. No upload, fully client-side." />
+<meta name="twitter:image" content="https://yourdomain.com/assets/csv-viewer-preview.png" />
+
+<!-- ===== PWA / MOBILE ===== -->
+<meta name="theme-color" content="#0f1115" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+
+<!-- ===== STRUCTURED DATA ===== -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Online CSV Viewer & Editor",
+  "description": "Free online CSV viewer and editor to edit and convert CSV files to Excel or PDF. Fully client-side and secure.",
+  "applicationCategory": "Utility",
+  "operatingSystem": "All",
+  "browserRequirements": "Requires JavaScript",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  }
+}
+</script>
+
+<style>
+:root{
+--bg:#0f1115;--card:#161a22;--border:#252b3a;
+--text:#e6e8ee;--muted:#9aa4bf;
+--accent:#4ade80;--accent2:#38bdf8
+}
+*{box-sizing:border-box;font-family:system-ui}
+body{
+margin:0;background:radial-gradient(circle at top,#1b2030,#0f1115 60%);
+color:var(--text);min-height:100vh;
+display:flex;justify-content:center;align-items:center
+}
+.container{width:95%;max-width:1300px}
+.card{
+background:var(--card);border-radius:14px;padding:24px;
+border:1px solid var(--border);
+box-shadow:0 10px 30px rgba(0,0,0,.4)
+}
+.header{display:flex;gap:14px;margin-bottom:18px;align-items:center}
+.csv-icon{
+width:46px;height:46px;border-radius:10px;
+background:linear-gradient(135deg,#22c55e,#16a34a);
+display:flex;align-items:center;justify-content:center;
+font-weight:800;color:#022c22
+}
+.title{font-size:1.4rem;font-weight:700}
+.subtitle{font-size:.85rem;color:var(--muted)}
+
+.upload{
+border:2px dashed var(--border);border-radius:12px;
+padding:28px;text-align:center;cursor:pointer;transition:.25s
+}
+.upload:hover{border-color:var(--accent2);background:rgba(56,189,248,.05)}
+.upload span{color:var(--accent2);font-weight:600}
+
+.controls{display:none;gap:10px;flex-wrap:wrap;margin:16px 0}
+.controls input,.controls button{
+padding:10px 14px;border-radius:10px;
+border:1px solid var(--border);
+background:#0c0f15;color:var(--text)
+}
+.controls button{cursor:pointer}
+.controls button:hover{border-color:var(--accent)}
+
+.table-wrap{
+max-height:450px;overflow:auto;border-radius:12px;
+border:1px solid var(--border)
+}
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+thead{position:sticky;top:0;background:#111524}
+th,td{
+padding:10px 12px;border-bottom:1px solid var(--border);
+white-space:nowrap
+}
+th{color:var(--accent)}
+td{cursor:text}
+td:focus{outline:2px solid var(--accent2)}
+tbody tr:hover{background:rgba(74,222,128,.05)}
+.empty{text-align:center;padding:30px;color:var(--muted)}
+</style>
+</head>
+<body>
+
+<div class="container">
+<div class="card">
+
+<div class="header">
+<div class="csv-icon">CSV</div>
+<div>
+<h1 class="title">Online CSV Viewer & Editor</h1>
+<p class="subtitle">Edit · Convert · Secure · Offline</p>
+</div>
+</div>
+
+<div class="upload" id="uploadBox">
+Drop <span>.csv</span> / <span>.xls</span> here or <span>click to browse</span>
+</div>
+<input type="file" id="fileInput" accept=".csv,.xls" hidden>
+
+<div class="controls" id="controls">
+<input type="text" id="search" placeholder="Search CSV...">
+<button onclick="exportCSV()">Export CSV</button>
+<button onclick="exportExcel()">Export Excel</button>
+<button onclick="exportPDF()">Export PDF</button>
+</div>
+
+<div class="table-wrap" id="tableWrap">
+<div class="empty">No file loaded</div>
+</div>
+
+</div>
+</div>
+
+<script>
+const fileInput=document.getElementById('fileInput');
+const uploadBox=document.getElementById('uploadBox');
+const tableWrap=document.getElementById('tableWrap');
+const searchInput=document.getElementById('search');
+const controls=document.getElementById('controls');
+let tableData=[];
+
+uploadBox.onclick=()=>fileInput.click();
+fileInput.onchange=e=>e.target.files[0]&&loadFile(e.target.files[0]);
+
+uploadBox.ondragover=e=>{e.preventDefault();uploadBox.style.borderColor="#38bdf8"}
+uploadBox.ondragleave=()=>uploadBox.style.borderColor="var(--border)"
+uploadBox.ondrop=e=>{
+e.preventDefault();uploadBox.style.borderColor="var(--border)";
+const f=e.dataTransfer.files[0];
+if(f)loadFile(f)
+}
+
+function loadFile(file){
+const r=new FileReader();
+if(file.name.endsWith('.xls')){
+r.onload=()=>loadExcelHTML(r.result);
+r.readAsText(file);
+}else{
+r.onload=()=>parseCSV(r.result);
+r.readAsText(file);
+}
+}
+
+function parseCSV(t){
+tableData=t.trim().split(/\r?\n/).map(r=>
+r.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/)
+.map(c=>c.replace(/^"|"$/g,'')));
+renderTable(tableData);controls.style.display='flex'
+}
+
+function loadExcelHTML(html){
+const d=document.createElement('div');d.innerHTML=html;
+tableData=[...d.querySelectorAll('tr')].map(tr=>
+[...tr.querySelectorAll('td,th')].map(td=>td.innerText));
+renderTable(tableData);controls.style.display='flex'
+}
+
+function renderTable(data){
+let h='<table><thead><tr>';
+data[0].forEach(c=>h+=`<th>${esc(c)}</th>`);
+h+='</tr></thead><tbody>';
+data.slice(1).forEach((r,i)=>{
+h+='<tr>';
+r.forEach((c,j)=>h+=`<td contenteditable oninput="tableData[${i+1}][${j}]=this.innerText">${esc(c)}</td>`);
+h+='</tr>';
+});
+h+='</tbody></table>';tableWrap.innerHTML=h
+}
+
+searchInput.oninput=()=>{
+const q=searchInput.value.toLowerCase();
+renderTable([tableData[0],...tableData.slice(1).filter(r=>r.join(' ').toLowerCase().includes(q))])
+}
+
+function exportCSV(){
+const csv=tableData.map(r=>r.map(c=>`"${c.replace(/"/g,'""')}"`).join(',')).join('\n');
+download(csv,'edited.csv','text/csv')
+}
+function exportExcel(){
+const html=`<table>${tableData.map(r=>'<tr>'+r.map(c=>`<td>${c}</td>`).join('')+'</tr>').join('')}</table>`;
+download(html,'edited.xls','application/vnd.ms-excel')
+}
+function exportPDF(){
+const w=window.open('');
+w.document.write(`<html><head><style>
+table{width:100%;border-collapse:collapse;font-size:10px}
+td,th{border:1px solid #000;padding:4px}
+@page{size:A4 landscape;margin:10mm}
+</style></head><body>${tableWrap.innerHTML}</body></html>`);
+w.document.close();setTimeout(()=>w.print(),500)
+}
+function download(d,n,t){
+const a=document.createElement('a');
+a.href=URL.createObjectURL(new Blob([d],{type:t}));
+a.download=n;a.click()
+}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+</script>
+
+</body>
+</html>
