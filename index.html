@@ -1,38 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
 
-<!-- ===== SEO META ===== -->
-<title>Online CSV Viewer & Editor – Edit, Convert CSV to Excel & PDF</title>
-<meta name="description" content="Free online CSV viewer and editor. Open, edit and convert CSV files to Excel or PDF instantly. 100% client-side, secure and offline capable." />
-<meta name="keywords" content="csv viewer online, edit csv online, csv to excel, csv to pdf, csv editor, open csv file online" />
-<meta name="robots" content="index, follow" />
-<meta name="author" content="Online CSV Viewer" />
-<meta name="google-site-verification" content="VSBl5weWwGZHXeyDEJx5MeZS1WBwyP_zfAzooD0S8Tc" />
-<link rel="canonical" href="https://csv-viewer.github.io/index.html" />
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#2563eb" id="theme-color-meta">
 
-<!-- ===== OPEN GRAPH ===== -->
-<meta property="og:type" content="website" />
-<meta property="og:title" content="Online CSV Viewer & Editor – Edit & Convert CSV Files" />
-<meta property="og:description" content="View, edit and convert CSV files to Excel or PDF online. Fully client-side, private and fast." />
-<meta property="og:url" content="https://csv-viewer.github.io/" />
-<meta property="og:image" content="https://csv-viewer.github.io/assets/csv-viewer-preview.png" />
+  <!-- ===== SEO META ===== -->
+  <title>Online CSV Viewer & Editor – Edit, Convert CSV to Excel & PDF</title>
+  <meta name="description"
+    content="Free online CSV viewer and editor. Open, edit and convert CSV files to Excel or PDF instantly. 100% client-side, secure and offline capable. XLSX support added." />
+  <meta name="keywords"
+    content="csv viewer online, edit csv online, csv to excel, csv to pdf, csv editor, open csv file online, xlsx viewer" />
+  <meta name="robots" content="index, follow" />
+  <meta name="author" content="Online CSV Viewer" />
+  <meta name="google-site-verification" content="VSBl5weWwGZHXeyDEJx5MeZS1WBwyP_zfAzooD0S8Tc" />
+  <link rel="canonical" href="https://csv-viewer.github.io/index.html" />
 
-<!-- ===== TWITTER ===== -->
-<meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Online CSV Viewer & Editor" />
-<meta name="twitter:description" content="Edit and convert CSV files to Excel or PDF online. No upload, fully client-side." />
-<meta name="twitter:image" content="https://csv-viewer.github.io/assets/csv-viewer-preview.png" />
+  <!-- ===== OPEN GRAPH ===== -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Online CSV Viewer & Editor – Edit & Convert CSV Files" />
+  <meta property="og:description"
+    content="View, edit and convert CSV files to Excel or PDF online. Fully client-side, private and fast." />
+  <meta property="og:url" content="https://csv-viewer.github.io/" />
+  <meta property="og:image" content="https://csv-viewer.github.io/assets/csv-viewer-preview.png" />
 
-<!-- ===== PWA / MOBILE ===== -->
-<meta name="theme-color" content="#0f1115" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  <!-- ===== TWITTER ===== -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Online CSV Viewer & Editor" />
+  <meta name="twitter:description"
+    content="Edit and convert CSV files to Excel or PDF online. No upload, fully client-side." />
+  <meta name="twitter:image" content="https://csv-viewer.github.io/assets/csv-viewer-preview.png" />
 
-<!-- ===== STRUCTURED DATA ===== -->
-<script type="application/ld+json">
+  <!-- ===== PWA / MOBILE ===== -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+  <!-- ===== STRUCTURED DATA ===== -->
+  <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "WebApplication",
@@ -49,184 +57,124 @@
 }
 </script>
 
-<style>
-:root{
---bg:#0f1115;--card:#161a22;--border:#252b3a;
---text:#e6e8ee;--muted:#9aa4bf;
---accent:#4ade80;--accent2:#38bdf8
-}
-*{box-sizing:border-box;font-family:system-ui}
-body{
-margin:0;background:radial-gradient(circle at top,#1b2030,#0f1115 60%);
-color:var(--text);min-height:100vh;
-display:flex;justify-content:center;align-items:center
-}
-.container{width:95%;max-width:1300px}
-.card{
-background:var(--card);border-radius:14px;padding:24px;
-border:1px solid var(--border);
-box-shadow:0 10px 30px rgba(0,0,0,.4)
-}
-.header{display:flex;gap:14px;margin-bottom:18px;align-items:center}
-.csv-icon{
-width:46px;height:46px;border-radius:10px;
-background:linear-gradient(135deg,#22c55e,#16a34a);
-display:flex;align-items:center;justify-content:center;
-font-weight:800;color:#022c22
-}
-.title{font-size:1.4rem;font-weight:700}
-.subtitle{font-size:.85rem;color:var(--muted)}
+  <!-- ===== INCLUDE JSZIP FOR XLSX PARSING ===== -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
-.upload{
-border:2px dashed var(--border);border-radius:12px;
-padding:28px;text-align:center;cursor:pointer;transition:.25s
-}
-.upload:hover{border-color:var(--accent2);background:rgba(56,189,248,.05)}
-.upload span{color:var(--accent2);font-weight:600}
-
-.controls{display:none;gap:10px;flex-wrap:wrap;margin:16px 0}
-.controls input,.controls button{
-padding:10px 14px;border-radius:10px;
-border:1px solid var(--border);
-background:#0c0f15;color:var(--text)
-}
-.controls button{cursor:pointer}
-.controls button:hover{border-color:var(--accent)}
-
-.table-wrap{
-max-height:450px;overflow:auto;border-radius:12px;
-border:1px solid var(--border)
-}
-table{width:100%;border-collapse:collapse;font-size:.9rem}
-thead{position:sticky;top:0;background:#111524}
-th,td{
-padding:10px 12px;border-bottom:1px solid var(--border);
-white-space:nowrap
-}
-th{color:var(--accent)}
-td{cursor:text}
-td:focus{outline:2px solid var(--accent2)}
-tbody tr:hover{background:rgba(74,222,128,.05)}
-.empty{text-align:center;padding:30px;color:var(--muted)}
-</style>
+  <link rel="stylesheet" href="assets/styles.css">
 </head>
+
 <body>
+  <div class="container">
+    <div class="card">
+      <div class="header">
+        <div class="brand">
+          <div class="csv-icon">CSV</div>
+          <div>
+            <h1 class="title">CSV Editor</h1>
+            <p class="subtitle">View · Edit · Convert · XLSX</p>
+          </div>
+        </div>
 
-<div class="container">
-<div class="card">
+        <div class="theme-toggle" id="themeToggleGroup">
+          <button id="themeLightBtn" class="theme-btn" title="Light theme">
+            <svg class="icon" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="5" />
+              <line x1="12" y1="1" x2="12" y2="3" />
+              <line x1="12" y1="21" x2="12" y2="23" />
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+              <line x1="1" y1="12" x2="3" y2="12" />
+              <line x1="21" y1="12" x2="23" y2="12" />
+            </svg>
+            Light
+          </button>
+          <button id="themeDarkBtn" class="theme-btn" title="Dark theme">
+            <svg class="icon" viewBox="0 0 24 24">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+            </svg>
+            Dark
+          </button>
+        </div>
+      </div>
 
-<div class="header">
-<div class="csv-icon">CSV</div>
-<div>
-<h1 class="title">Online CSV Viewer & Editor</h1>
-<p class="subtitle">Edit · Convert · Secure · Offline</p>
-</div>
-</div>
+      <div class="onboarding-guide" id="onboardingGuide">
+        <div class="guide-steps">
+          <div class="step">
+            <span class="step-indicator">1</span>
+            <span>📁 Drop or click to load CSV/XLSX</span>
+          </div>
+          <div class="step">
+            <span class="step-indicator">2</span>
+            <span>✏️ Double-click cells to edit</span>
+          </div>
+          <div class="step">
+            <span class="step-indicator">3</span>
+            <span>⬇️ Export</span>
+          </div>
+        </div>
+        <button id="dismissGuideBtn" class="dismiss-guide">
+          <svg class="icon icon-sm" viewBox="0 0 24 24">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+          Dismiss
+        </button>
+      </div>
 
-<div class="upload" id="uploadBox">
-Drop <span>.csv</span> / <span>.xls</span> here or <span>click to browse</span>
-</div>
-<input type="file" id="fileInput" accept=".csv,.xls" hidden>
+      <div class="upload" id="uploadBox">
+        <svg class="icon icon-lg" viewBox="0 0 24 24" style="margin-bottom: 8px;">
+          <rect x="2" y="3" width="20" height="18" rx="2" ry="2" />
+          <line x1="9" y1="9" x2="15" y2="9" />
+          <line x1="12" y1="6" x2="12" y2="12" />
+        </svg>
+        <div>Drop <span>.csv, .xls, .xlsx</span> or <span>click</span></div>
+      </div>
+      <input type="file" id="fileInput" accept=".csv,.xls,.xlsx" hidden>
 
-<div class="controls" id="controls">
-<input type="text" id="search" placeholder="Search CSV...">
-<button onclick="exportCSV()">Export CSV</button>
-<button onclick="exportExcel()">Export Excel</button>
-<button onclick="exportPDF()">Export PDF</button>
-</div>
+      <div class="controls" id="controls">
+        <input type="text" id="search" placeholder="Search...">
+        <button onclick="exportCSV()">
+          <svg class="icon" viewBox="0 0 24 24">
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+          CSV
+        </button>
+        <button onclick="exportExcel()">
+          <svg class="icon" viewBox="0 0 24 24">
+            <rect x="4" y="2" width="16" height="20" rx="2" ry="2" />
+            <line x1="8" y1="8" x2="16" y2="8" />
+            <line x1="8" y1="12" x2="16" y2="12" />
+          </svg>
+          XLS
+        </button>
+        <button onclick="exportPDF()">
+          <svg class="icon" viewBox="0 0 24 24">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+            <polyline points="14 2 14 8 20 8" />
+          </svg>
+          PDF
+        </button>
+      </div>
 
-<div class="table-wrap" id="tableWrap">
-<div class="empty">No file loaded</div>
-</div>
+      <div class="table-wrap" id="tableWrap">
+        <div class="empty-state">
+          <svg class="icon" viewBox="0 0 24 24" width="48" height="48">
+            <rect x="2" y="4" width="20" height="16" rx="2" ry="2" />
+            <line x1="8" y1="10" x2="16" y2="10" />
+            <line x1="8" y1="14" x2="12" y2="14" />
+          </svg>
+          <p><strong>No file loaded</strong><br><span style="color: var(--muted);">Click or drag file to start</span>
+          </p>
+        </div>
+      </div>
 
-</div>
-</div>
+    </div>
+  </div>
 
-<script>
-const fileInput=document.getElementById('fileInput');
-const uploadBox=document.getElementById('uploadBox');
-const tableWrap=document.getElementById('tableWrap');
-const searchInput=document.getElementById('search');
-const controls=document.getElementById('controls');
-let tableData=[];
+  <div id="feedbackToast">✨ Ready</div>
 
-uploadBox.onclick=()=>fileInput.click();
-fileInput.onchange=e=>e.target.files[0]&&loadFile(e.target.files[0]);
-
-uploadBox.ondragover=e=>{e.preventDefault();uploadBox.style.borderColor="#38bdf8"}
-uploadBox.ondragleave=()=>uploadBox.style.borderColor="var(--border)"
-uploadBox.ondrop=e=>{
-e.preventDefault();uploadBox.style.borderColor="var(--border)";
-const f=e.dataTransfer.files[0];
-if(f)loadFile(f)
-}
-
-function loadFile(file){
-const r=new FileReader();
-if(file.name.endsWith('.xls')){
-r.onload=()=>loadExcelHTML(r.result);
-r.readAsText(file);
-}else{
-r.onload=()=>parseCSV(r.result);
-r.readAsText(file);
-}
-}
-
-function parseCSV(t){
-tableData=t.trim().split(/\r?\n/).map(r=>
-r.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/)
-.map(c=>c.replace(/^"|"$/g,'')));
-renderTable(tableData);controls.style.display='flex'
-}
-
-function loadExcelHTML(html){
-const d=document.createElement('div');d.innerHTML=html;
-tableData=[...d.querySelectorAll('tr')].map(tr=>
-[...tr.querySelectorAll('td,th')].map(td=>td.innerText));
-renderTable(tableData);controls.style.display='flex'
-}
-
-function renderTable(data){
-let h='<table><thead><tr>';
-data[0].forEach(c=>h+=`<th>${esc(c)}</th>`);
-h+='</tr></thead><tbody>';
-data.slice(1).forEach((r,i)=>{
-h+='<tr>';
-r.forEach((c,j)=>h+=`<td contenteditable oninput="tableData[${i+1}][${j}]=this.innerText">${esc(c)}</td>`);
-h+='</tr>';
-});
-h+='</tbody></table>';tableWrap.innerHTML=h
-}
-
-searchInput.oninput=()=>{
-const q=searchInput.value.toLowerCase();
-renderTable([tableData[0],...tableData.slice(1).filter(r=>r.join(' ').toLowerCase().includes(q))])
-}
-
-function exportCSV(){
-const csv=tableData.map(r=>r.map(c=>`"${c.replace(/"/g,'""')}"`).join(',')).join('\n');
-download(csv,'edited.csv','text/csv')
-}
-function exportExcel(){
-const html=`<table>${tableData.map(r=>'<tr>'+r.map(c=>`<td>${c}</td>`).join('')+'</tr>').join('')}</table>`;
-download(html,'edited.xls','application/vnd.ms-excel')
-}
-function exportPDF(){
-const w=window.open('');
-w.document.write(`<html><head><style>
-table{width:100%;border-collapse:collapse;font-size:10px}
-td,th{border:1px solid #000;padding:4px}
-@page{size:A4 landscape;margin:10mm}
-</style></head><body>${tableWrap.innerHTML}</body></html>`);
-w.document.close();setTimeout(()=>w.print(),500)
-}
-function download(d,n,t){
-const a=document.createElement('a');
-a.href=URL.createObjectURL(new Blob([d],{type:t}));
-a.download=n;a.click()
-}
-function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
-</script>
-
+  <script src="assets/script.js"></script>
 </body>
+
 </html>
