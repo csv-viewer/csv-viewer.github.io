@@ -979,55 +979,122 @@
     window.exportPDF = async function() {
       if (!tableData.length) return showToast('❌ No data to export', 1500);
 
-      showToast('⏳ Generating PDF…', 3000);
+      showToast('⏳ Generating PDF…', 4000);
 
       try {
         const { jsPDF } = window.jspdf;
 
-        // Build an off-screen table with clean print styles
+        // Rebuild a clean flat table (no sticky/overflow) to avoid html2canvas bugs
+        const tableEl = tableWrap.querySelector('table');
+        if (!tableEl) return showToast('❌ No table found', 1500);
+
+        // Clone and strip sticky positioning from thead
+        const clone = tableEl.cloneNode(true);
+        const cloneThead = clone.querySelector('thead');
+        if (cloneThead) {
+          cloneThead.style.position = 'static';
+          cloneThead.style.top = 'auto';
+          cloneThead.style.zIndex = 'auto';
+        }
+        // Make all th/td wrap so nothing is clipped
+        clone.querySelectorAll('th, td').forEach(cell => {
+          cell.style.whiteSpace = 'normal';
+          cell.removeAttribute('contenteditable');
+        });
+
+        // Off-screen container — wide enough for landscape A4 at ~96dpi
         const container = document.createElement('div');
         container.style.cssText = [
-          'position:fixed', 'top:-9999px', 'left:-9999px',
-          'background:#fff', 'color:#000',
+          'position:fixed',
+          'top:-99999px',
+          'left:-99999px',
+          'background:#ffffff',
+          'color:#000000',
           'font-family:system-ui,sans-serif',
-          'padding:12px', 'width:1100px'
+          'padding:16px',
+          'width:1123px',   // ~A4 landscape pixel width at 96dpi
+          'overflow:visible'
         ].join(';');
 
-        container.innerHTML = `
-          <style>
-            table { border-collapse:collapse; width:100%; font-size:10px; }
-            th { background:#f0f0f0; font-weight:700; border:1px solid #555; padding:5px 6px; }
-            td { border:1px solid #999; padding:4px 6px; }
-          </style>
-          ${tableWrap.innerHTML}`;
-
+        // Inject print-clean styles into the clone
+        const style = document.createElement('style');
+        style.textContent = `
+          table { border-collapse:collapse; width:100%; font-size:10px; table-layout:auto; }
+          thead { position:static !important; top:auto !important; }
+          th { background:#f0f0f0 !important; font-weight:700; border:1px solid #555; padding:5px 6px; color:#000 !important; }
+          td { border:1px solid #aaa; padding:4px 6px; color:#000 !important; background:#fff !important; }
+        `;
+        container.appendChild(style);
+        container.appendChild(clone);
         document.body.appendChild(container);
+
+        // Wait a tick so layout settles
+        await new Promise(r => setTimeout(r, 80));
 
         const canvas = await html2canvas(container, {
           scale: 2,
           useCORS: true,
           backgroundColor: '#ffffff',
-          logging: false
+          logging: false,
+          scrollX: 0,
+          scrollY: 0
         });
 
         document.body.removeChild(container);
 
-        const imgW = 297; // A4 landscape width in mm
+        // Fit image into A4 landscape (297 × 210 mm)
+        const PAGE_W = 297;
+        const PAGE_H = 210;
+        const imgW = PAGE_W;
         const imgH = (canvas.height / canvas.width) * imgW;
 
+        // If content is taller than one page, use portrait or multi-page
+        const useLandscape = imgH <= PAGE_H || imgW >= imgH;
         const pdf = new jsPDF({
-          orientation: imgH > imgW ? 'portrait' : 'landscape',
+          orientation: useLandscape ? 'landscape' : 'portrait',
           unit: 'mm',
-          format: [imgW, Math.max(imgH, 210)]
+          format: 'a4'
         });
 
-        pdf.addImage(
-          canvas.toDataURL('image/png'),
-          'PNG', 0, 0, imgW, imgH,
-          '', 'FAST'
-        );
+        const pageW = pdf.internal.pageSize.getWidth();
+        const pageH = pdf.internal.pageSize.getHeight();
+        const ratio = canvas.width / canvas.height;
+        const fitW = pageW;
+        const fitH = fitW / ratio;
 
-        pdf.save('exported.pdf');
+        if (fitH <= pageH) {
+          // Fits in one page
+          pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, fitW, fitH, '', 'FAST');
+        } else {
+          // Multi-page: slice canvas into page-height chunks
+          const pageCanvas = document.createElement('canvas');
+          pageCanvas.width = canvas.width;
+          const sliceH = Math.floor((pageH / fitW) * canvas.width); // pixels per page slice
+          pageCanvas.height = sliceH;
+          const ctx = pageCanvas.getContext('2d');
+          let y = 0;
+          let pageNum = 0;
+          while (y < canvas.height) {
+            ctx.clearRect(0, 0, pageCanvas.width, pageCanvas.height);
+            ctx.drawImage(canvas, 0, y, canvas.width, sliceH, 0, 0, canvas.width, sliceH);
+            if (pageNum > 0) pdf.addPage();
+            pdf.addImage(pageCanvas.toDataURL('image/png'), 'PNG', 0, 0, fitW, pageH, '', 'FAST');
+            y += sliceH;
+            pageNum++;
+          }
+        }
+
+        // Use blob URL + anchor click — works on both desktop and mobile browsers
+        const blob = pdf.output('blob');
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'exported.pdf';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 5000);
+
         showToast('✅ PDF downloaded!');
       } catch (err) {
         console.error('PDF export error:', err);
