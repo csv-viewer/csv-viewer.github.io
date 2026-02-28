@@ -3,376 +3,1160 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
 
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#2563eb">
-
+  <meta name="theme-color" content="#2563eb" id="theme-color-meta">
 
   <!-- ===== SEO META ===== -->
-  <title>Online CSV Viewer & Editor – Edit, Convert CSV to Excel & PDF</title>
+  <title>Online CSV Viewer & Editor – Free XLS, XLSX Editor, Convert to Excel PDF</title>
   <meta name="description"
-    content="Free online CSV viewer and editor. Open, edit and convert CSV files to Excel or PDF instantly. 100% client-side, secure and offline capable." />
+    content="Free online CSV, XLS and XLSX viewer & editor. Open, edit and convert Excel files to CSV or PDF. 100% client-side, private & secure. Supports old Excel .xls files." />
   <meta name="keywords"
-    content="csv viewer online, edit csv online, csv to excel, csv to pdf, csv editor, open csv file online" />
+    content="csv viewer online, xlsx viewer, xls viewer, edit xls online free, edit xlsx online free, csv to excel, excel to csv, csv editor, open xls online, merged cells support" />
   <meta name="robots" content="index, follow" />
-  <meta name="author" content="Online CSV Viewer" />
+  <meta name="author" content="Online CSV Editor" />
   <meta name="google-site-verification" content="VSBl5weWwGZHXeyDEJx5MeZS1WBwyP_zfAzooD0S8Tc" />
-  <link rel="canonical" href="https://csv-viewer.github.io/index.html" />
+  <link rel="canonical" href="https://csv-viewer.github.io/" />
 
   <!-- ===== OPEN GRAPH ===== -->
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="Online CSV Viewer & Editor – Edit & Convert CSV Files" />
+  <meta property="og:title" content="Free Online CSV, XLS & XLSX Editor – Edit Excel Files in Browser" />
   <meta property="og:description"
-    content="View, edit and convert CSV files to Excel or PDF online. Fully client-side, private and fast." />
+    content="Edit CSV, XLS and XLSX files online. No installation, no upload. Merged cells support, export to Excel, PDF, CSV." />
   <meta property="og:url" content="https://csv-viewer.github.io/" />
   <meta property="og:image" content="https://csv-viewer.github.io/assets/csv-viewer-preview.png" />
+  <meta property="og:site_name" content="Online CSV Editor" />
 
   <!-- ===== TWITTER ===== -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Online CSV Viewer & Editor" />
+  <meta name="twitter:title" content="Free Online CSV, XLS & XLSX Editor" />
   <meta name="twitter:description"
-    content="Edit and convert CSV files to Excel or PDF online. No upload, fully client-side." />
+    content="Edit Excel files directly in browser. No install, private, supports merged cells and old .xls format." />
   <meta name="twitter:image" content="https://csv-viewer.github.io/assets/csv-viewer-preview.png" />
 
-  <!-- ===== PWA / MOBILE ===== -->
-  <meta name="theme-color" content="#0f1115" />
+  <!-- ===== MOBILE WEB APP ===== -->
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
   <!-- ===== STRUCTURED DATA ===== -->
   <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "WebApplication",
-  "name": "Online CSV Viewer & Editor",
-  "description": "Free online CSV viewer and editor to edit and convert CSV files to Excel or PDF. Fully client-side and secure.",
-  "applicationCategory": "Utility",
+  "name": "Online CSV, XLS & XLSX Editor",
+  "description": "Free online spreadsheet editor for CSV, XLS and XLSX files. Edit, convert to Excel or PDF. 100% client-side.",
+  "applicationCategory": "BusinessApplication",
   "operatingSystem": "All",
-  "browserRequirements": "Requires JavaScript",
+  "browserRequirements": "JavaScript enabled",
   "offers": {
     "@type": "Offer",
     "price": "0",
     "priceCurrency": "USD"
-  }
+  },
+  "featureList": [
+    "CSV editing",
+    "XLS (old Excel) support",
+    "XLSX viewing and editing",
+    "Merged cells support",
+    "Export to XLSX",
+    "Export to PDF",
+    "Dark mode"
+  ]
 }
 </script>
 
+  <!-- ===== SHEETJS FOR BOTH XLSX AND OLD XLS ===== -->
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+
+  <!-- ===== PDF EXPORT (jsPDF + html2canvas) ===== -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
   <style>
+    /* ----- LIGHT THEME (default) ----- */
     :root {
-      --bg: #0f1115;
-      --card: #161a22;
-      --border: #252b3a;
-      --text: #e6e8ee;
-      --muted: #9aa4bf;
+      --bg: #f8fafd;
+      --card: #ffffff;
+      --border: #e2e8f0;
+      --text: #1e293b;
+      --muted: #475569;
+      --accent: #0f7832;
+      --accent2: #2563eb;
+      --th-bg: #f1f5f9;
+      --table-header: #0a4b2e;
+      --cell-border: #cbd5e1;
+      --hover-row: rgba(37, 99, 235, 0.04);
+      --shadow: 0 8px 24px rgba(0,0,0,0.05);
+      --upload-dash: #2563eb;
+      --btn-bg: #f1f5f9;
+      --btn-text: #1e293b;
+      --btn-hover: #e2e8f0;
+      --toggle-bg: #e2e8f0;
+      --guide-bg: #f1f5f9;
+      --icon-stroke: #1e293b;
+      --loader: #2563eb;
+    }
+
+    /* ----- DARK THEME ----- */
+    :root[data-theme="dark"] {
+      --bg: #0a0c10;
+      --card: #161b22;
+      --border: #2d333b;
+      --text: #e6edf3;
+      --muted: #8b949e;
       --accent: #4ade80;
-      --accent2: #38bdf8
+      --accent2: #388bfd;
+      --th-bg: #1c2128;
+      --table-header: #8bffa4;
+      --cell-border: #3d444d;
+      --hover-row: rgba(56, 139, 253, 0.1);
+      --shadow: 0 8px 24px rgba(0,0,0,0.4);
+      --upload-dash: #388bfd;
+      --btn-bg: #2d333b;
+      --btn-text: #e6edf3;
+      --btn-hover: #3d444d;
+      --toggle-bg: #2d333b;
+      --guide-bg: #1c2128;
+      --icon-stroke: #e6edf3;
+      --loader: #388bfd;
     }
 
     * {
       box-sizing: border-box;
-      font-family: system-ui
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      margin: 0;
+      padding: 0;
     }
 
     body {
       margin: 0;
-      background: radial-gradient(circle at top, #1b2030, #0f1115 60%);
+      background: var(--bg);
       color: var(--text);
       min-height: 100vh;
       display: flex;
       justify-content: center;
-      align-items: center
+      align-items: center;
+      transition: background 0.2s, color 0.2s;
+      padding: 16px;
     }
 
-    #installBtn {
-
-      min-width: 150px;
-      aspect-ratio: 3 / 1;
-      margin-inline: 50%;
-      transform: translateX(-50%);
-      padding: 10px 16px;
-      margin-bottom: 50px;
-      background: #2563eb;
-      color: white;
-      font-size: 1.1rem;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
+    .icon {
+      width: 20px;
+      height: 20px;
+      display: inline-block;
+      stroke: var(--icon-stroke);
+      fill: none;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      vertical-align: middle;
     }
+
+    .icon-sm { width: 18px; height: 18px; }
+    .icon-lg { width: 24px; height: 24px; }
 
     .container {
-      width: 95%;
-      max-width: 1300px
+      width: 100%;
+      max-width: 1400px;
     }
 
     .card {
       background: var(--card);
-      border-radius: 14px;
-      padding: 24px;
+      border-radius: 20px;
+      padding: 28px 24px;
       border: 1px solid var(--border);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, .4)
+      box-shadow: var(--shadow);
+      transition: background 0.2s, border 0.2s;
     }
 
     .header {
       display: flex;
-      gap: 14px;
-      margin-bottom: 18px;
-      align-items: center
+      flex-wrap: wrap;
+      gap: 16px 24px;
+      margin-bottom: 20px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      display: flex;
+      gap: 16px;
+      align-items: center;
     }
 
     .csv-icon {
-      width: 46px;
-      height: 46px;
-      border-radius: 10px;
-      background: linear-gradient(135deg, #22c55e, #16a34a);
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: linear-gradient(145deg, #22c55e, #15803d);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 800;
-      color: #022c22
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: white;
+      box-shadow: 0 4px 10px rgba(34,197,94,0.2);
     }
 
     .title {
-      font-size: 1.4rem;
-      font-weight: 700
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin: 0;
+      line-height: 1.2;
+      letter-spacing: -0.01em;
     }
 
     .subtitle {
-      font-size: .85rem;
-      color: var(--muted)
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .theme-toggle {
+      display: flex;
+      background: var(--toggle-bg);
+      border-radius: 10px;
+      padding: 4px;
+      border: 1px solid var(--border);
+    }
+
+    .theme-btn {
+      background: transparent;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: 0.1s;
+    }
+
+    .theme-btn.active {
+      background: var(--card);
+      border: 1px solid var(--border);
+    }
+
+    .onboarding-guide {
+      background: var(--guide-bg);
+      border-left: 5px solid var(--accent2);
+      border-radius: 12px;
+      padding: 14px 20px;
+      margin-bottom: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      border: 1px solid var(--border);
+      font-size: 0.9rem;
+    }
+
+    .guide-steps {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .step {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .step-indicator {
+      background: var(--accent2);
+      color: white;
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .dismiss-guide {
+      background: transparent;
+      border: 1px solid var(--border);
+      padding: 6px 14px;
+      border-radius: 6px;
+      color: var(--muted);
+      font-size: 0.8rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .upload {
       border: 2px dashed var(--border);
-      border-radius: 12px;
-      padding: 28px;
+      border-radius: 16px;
+      padding: 24px 20px;
       text-align: center;
       cursor: pointer;
-      transition: .25s
+      transition: 0.2s;
+      border-color: var(--upload-dash);
+      background: var(--card);
+      margin-bottom: 16px;
+      position: relative;
     }
 
     .upload:hover {
+      background: var(--hover-row);
       border-color: var(--accent2);
-      background: rgba(56, 189, 248, .05)
     }
 
     .upload span {
       color: var(--accent2);
-      font-weight: 600
+      font-weight: 600;
+    }
+
+    /* ----- LOADING OVERLAY ----- */
+    .loading-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--card);
+      border-radius: 16px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      opacity: 0.95;
+      z-index: 20;
+    }
+
+    .loading-spinner {
+      width: 30px;
+      height: 30px;
+      border: 3px solid var(--border);
+      border-top: 3px solid var(--loader);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
 
     .controls {
       display: none;
       gap: 10px;
       flex-wrap: wrap;
-      margin: 16px 0
+      margin: 16px 0 16px;
     }
 
     .controls input,
     .controls button {
-      padding: 10px 14px;
-      border-radius: 10px;
+      padding: 8px 16px;
+      border-radius: 8px;
       border: 1px solid var(--border);
-      background: #0c0f15;
-      color: var(--text)
+      background: var(--btn-bg);
+      color: var(--btn-text);
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .controls input {
+      background: var(--card);
+      flex: 1 1 200px;
     }
 
     .controls button {
-      cursor: pointer
+      background: var(--btn-bg);
+      color: var(--btn-text);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: 0.15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .controls button:hover {
-      border-color: var(--accent)
+      background: var(--btn-hover);
+      border-color: var(--accent2);
     }
 
     .table-wrap {
-      max-height: 450px;
+      max-height: 460px;
       overflow: auto;
       border-radius: 12px;
-      border: 1px solid var(--border)
+      border: 1px solid var(--border);
+      background: var(--card);
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      font-size: .9rem
+      font-size: 0.85rem;
     }
 
     thead {
       position: sticky;
       top: 0;
-      background: #111524
-    }
-
-    th,
-    td {
-      padding: 10px 12px;
-      border-bottom: 1px solid var(--border);
-      white-space: nowrap
+      background: var(--th-bg);
+      z-index: 10;
     }
 
     th {
-      color: var(--accent)
+      padding: 10px 8px;
+      color: var(--table-header);
+      font-weight: 700;
+      border: 1px solid var(--cell-border);
+      white-space: nowrap;
+      background: var(--th-bg);
     }
 
     td {
-      cursor: text
+      padding: 8px 6px;
+      border: 1px solid var(--cell-border);
+      white-space: nowrap;
+      cursor: text;
+      background: var(--card);
+      color: var(--text);
+    }
+
+    td[colspan], td[rowspan] {
+      background: var(--card);
     }
 
     td:focus {
-      outline: 2px solid var(--accent2)
+      outline: 2px solid var(--accent2);
+      outline-offset: -2px;
     }
 
-    tbody tr:hover {
-      background: rgba(74, 222, 128, .05)
+    tbody tr:hover td {
+      background: var(--hover-row);
     }
 
-    .empty {
+    .empty-state {
       text-align: center;
-      padding: 30px;
-      color: var(--muted)
+      padding: 40px 20px;
+      color: var(--muted);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    @media (max-width: 640px) {
+      body { padding: 8px; }
+      .card { padding: 20px 12px; }
+      .title { font-size: 1.3rem; }
+      .onboarding-guide { padding: 12px; }
+      .guide-steps { gap: 12px; }
+      .step { width: 100%; }
+    }
+
+    #feedbackToast {
+      visibility: hidden;
+      min-width: 240px;
+      background: var(--accent2);
+      color: white;
+      text-align: center;
+      border-radius: 10px;
+      padding: 12px 20px;
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-weight: 600;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      z-index: 999;
+      transition: visibility 0.2s, opacity 0.2s;
+      opacity: 0;
+    }
+    #feedbackToast.show {
+      visibility: visible;
+      opacity: 1;
     }
   </style>
 </head>
 
 <body>
   <div class="container">
-    <button id="installBtn" hidden>🔖 Install App</button>
     <div class="card">
+      
       <div class="header">
-        <div class="csv-icon">CSV</div>
-        <div>
-          <h1 class="title">Online CSV Viewer & Editor</h1>
-          <p class="subtitle">Edit · Convert · Secure · Offline</p>
+        <div class="brand">
+          <div class="csv-icon">CSV</div>
+          <div>
+            <h1 class="title">Excel & CSV Editor</h1>
+            <p class="subtitle">Edit · XLS/XLSX · Merged cells · Dark mode</p>
+          </div>
+        </div>
+        
+        <div class="theme-toggle" id="themeToggleGroup">
+          <button id="themeLightBtn" class="theme-btn" title="Light theme">
+            <svg class="icon" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="5" />
+              <line x1="12" y1="1" x2="12" y2="3" />
+              <line x1="12" y1="21" x2="12" y2="23" />
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+              <line x1="1" y1="12" x2="3" y2="12" />
+              <line x1="21" y1="12" x2="23" y2="12" />
+            </svg>
+            Light
+          </button>
+          <button id="themeDarkBtn" class="theme-btn" title="Dark theme">
+            <svg class="icon" viewBox="0 0 24 24">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+            </svg>
+            Dark
+          </button>
         </div>
       </div>
 
-      <div class="upload" id="uploadBox">
-        Drop <span>.csv</span> / <span>.xls</span> here or <span>click to browse</span>
+      <div class="onboarding-guide" id="onboardingGuide">
+        <div class="guide-steps">
+          <div class="step">
+            <span class="step-indicator">1</span>
+            <span>📁 Drop or click to load CSV/XLS/XLSX</span>
+          </div>
+          <div class="step">
+            <span class="step-indicator">2</span>
+            <span>✏️ Double-click cells to edit</span>
+          </div>
+          <div class="step">
+            <span class="step-indicator">3</span>
+            <span>⬇️ Export to XLSX/CSV/PDF</span>
+          </div>
+        </div>
+        <button id="dismissGuideBtn" class="dismiss-guide">
+          <svg class="icon icon-sm" viewBox="0 0 24 24">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+          Dismiss
+        </button>
       </div>
-      <input type="file" id="fileInput" accept=".csv,.xls" hidden>
+
+      <div class="upload" id="uploadBox">
+        <!-- Loading overlay -->
+        <div class="loading-overlay" id="loadingOverlay">
+          <div class="loading-spinner"></div>
+          <span style="color: var(--text);">Processing file... please wait</span>
+        </div>
+        
+        <svg class="icon icon-lg" viewBox="0 0 24 24" style="margin-bottom: 6px;">
+          <rect x="2" y="3" width="20" height="18" rx="2" ry="2" />
+          <line x1="12" y1="6" x2="12" y2="12" />
+        </svg>
+        <div>Drop <span>.csv, .xls, .xlsx</span> or <span>click to browse</span></div>
+        <div style="font-size: 0.75rem; margin-top: 6px; color: var(--muted);">✓ Old Excel .xls files supported • Merged cells preserved</div>
+      </div>
+      <input type="file" id="fileInput" accept=".csv,.xls,.xlsx" hidden>
 
       <div class="controls" id="controls">
-        <input type="text" id="search" placeholder="Search CSV...">
-        <button onclick="exportCSV()">Export CSV</button>
-        <button onclick="exportExcel()">Export Excel</button>
-        <button onclick="exportPDF()">Export PDF</button>
+        <input type="text" id="search" placeholder="Search across rows...">
+        <button onclick="exportCSV()">
+          <svg class="icon" viewBox="0 0 24 24">
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+          CSV
+        </button>
+        <button onclick="exportXLSX()" style="background: var(--accent2); color: white; border-color: var(--accent2);">
+          <svg class="icon" viewBox="0 0 24 24" style="stroke: white;">
+            <rect x="4" y="2" width="16" height="20" rx="2" ry="2" />
+            <line x1="8" y1="8" x2="16" y2="8" />
+            <line x1="8" y1="12" x2="16" y2="12" />
+            <line x1="8" y1="16" x2="12" y2="16" />
+          </svg>
+          XLSX
+        </button>
+        <button onclick="exportPDF()">
+          <svg class="icon" viewBox="0 0 24 24">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+            <polyline points="14 2 14 8 20 8" />
+          </svg>
+          PDF
+        </button>
       </div>
 
       <div class="table-wrap" id="tableWrap">
-        <div class="empty">No file loaded</div>
+        <div class="empty-state">
+          <svg class="icon" viewBox="0 0 24 24" width="40" height="40">
+            <rect x="2" y="4" width="20" height="16" rx="2" ry="2" />
+          </svg>
+          <p><strong>No file loaded</strong><br><span style="color: var(--muted);">Click or drag Excel/CSV file to start — old .xls fully supported</span></p>
+        </div>
       </div>
 
     </div>
   </div>
 
+  <div id="feedbackToast">✨ Ready</div>
 
   <script>
+    // ========== PROFESSIONAL EXCEL EDITOR ==========
+    // Supports XLS (old), XLSX, CSV - with loading indicator and merged cells
+    
+    // ----- THEME -----
+    const root = document.documentElement;
+    const metaThemeColor = document.getElementById('theme-color-meta');
+    const lightBtn = document.getElementById('themeLightBtn');
+    const darkBtn = document.getElementById('themeDarkBtn');
+
+    function setTheme(theme, save = true) {
+      if (theme === 'dark') {
+        root.setAttribute('data-theme', 'dark');
+        metaThemeColor.setAttribute('content', '#0a0c10');
+        darkBtn.classList.add('active');
+        lightBtn.classList.remove('active');
+      } else {
+        root.setAttribute('data-theme', 'light');
+        metaThemeColor.setAttribute('content', '#2563eb');
+        lightBtn.classList.add('active');
+        darkBtn.classList.remove('active');
+      }
+      if (save) localStorage.setItem('csv-theme', theme);
+    }
+
+    const saved = localStorage.getItem('csv-theme');
+    if (saved) setTheme(saved, false);
+    else setTheme(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light', false);
+
+    lightBtn.onclick = () => setTheme('light');
+    darkBtn.onclick = () => setTheme('dark');
+
+    // ----- ONBOARDING -----
+    const guide = document.getElementById('onboardingGuide');
+    if (localStorage.getItem('guideDismissed') === 'true') guide.style.display = 'none';
+    
+    document.getElementById('dismissGuideBtn').onclick = () => {
+      guide.style.display = 'none';
+      localStorage.setItem('guideDismissed', 'true');
+    };
+
+    // ----- TOAST -----
+    const toast = document.getElementById('feedbackToast');
+    function showToast(msg, duration = 2000) {
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), duration);
+    }
+
+    // ----- LOADING INDICATOR -----
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    function showLoading(show) {
+      loadingOverlay.style.display = show ? 'flex' : 'none';
+    }
+
+    // ----- CORE VARIABLES -----
     const fileInput = document.getElementById('fileInput');
     const uploadBox = document.getElementById('uploadBox');
     const tableWrap = document.getElementById('tableWrap');
     const searchInput = document.getElementById('search');
     const controls = document.getElementById('controls');
     let tableData = [];
+    let currentFilter = '';
+    let currentMergedCells = [];
+    let currentCellStyles = {}; // Store cell styles from Excel
+    let currentWorksheet = null; // Store worksheet for style access
 
-    uploadBox.onclick = () => fileInput.click();
-    fileInput.onchange = e => e.target.files[0] && loadFile(e.target.files[0]);
-
-    uploadBox.ondragover = e => { e.preventDefault(); uploadBox.style.borderColor = "#38bdf8" }
-    uploadBox.ondragleave = () => uploadBox.style.borderColor = "var(--border)"
-    uploadBox.ondrop = e => {
-      e.preventDefault(); uploadBox.style.borderColor = "var(--border)";
-      const f = e.dataTransfer.files[0];
-      if (f) loadFile(f)
-    }
-
-    function loadFile(file) {
-      const r = new FileReader();
-      if (file.name.endsWith('.xls')) {
-        r.onload = () => loadExcelHTML(r.result);
-        r.readAsText(file);
-      } else {
-        r.onload = () => parseCSV(r.result);
-        r.readAsText(file);
+    // ----- LOAD EXCEL FILES (XLS, XLSX) WITH SHEETJS -----
+    async function loadExcelFile(arrayBuffer) {
+      try {
+        showLoading(true);
+        
+        // Read the file - SheetJS handles both XLS and XLSX automatically
+        const workbook = XLSX.read(arrayBuffer, { 
+          type: 'array',
+          cellDates: true,
+          cellNF: false,
+          cellText: false,
+          cellStyles: true
+        });
+        
+        const firstSheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[firstSheetName];
+        currentWorksheet = worksheet; // Store for style access
+        
+        // Extract merged cells
+        currentMergedCells = worksheet['!merges'] || [];
+        
+        // Extract cell styles
+        currentCellStyles = {};
+        for (let cellAddr in worksheet) {
+          if (cellAddr[0] === '!') continue;
+          const cell = worksheet[cellAddr];
+          if (cell && cell.s) {
+            currentCellStyles[cellAddr] = cell.s;
+          }
+        }
+        
+        // Convert to array of arrays, preserving all data
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, { 
+          header: 1, 
+          defval: '',
+          blankrows: true,
+          raw: false
+        });
+        
+        // Filter out completely empty rows but keep rows with data
+        tableData = jsonData.filter(row => {
+          // Keep row if it has at least one non-empty cell
+          return row && row.length > 0 && row.some(cell => cell !== undefined && cell !== null && cell !== '');
+        });
+        
+        // If no data found, show meaningful error
+        if (tableData.length === 0) {
+          showToast('⚠️ No data found in file', 3000);
+          showLoading(false);
+          return;
+        }
+        
+        // Normalize row lengths
+        const maxCols = Math.max(...tableData.map(row => row.length));
+        tableData = tableData.map(row => {
+          const newRow = [...row];
+          while (newRow.length < maxCols) newRow.push('');
+          return newRow;
+        });
+        
+        renderTable(tableData, currentMergedCells);
+        controls.style.display = 'flex';
+        showToast(`✅ ${workbook.SheetNames.length} sheet(s) loaded - ${tableData.length} rows`);
+        showLoading(false);
+      } catch (err) {
+        console.error('Excel load error:', err);
+        showToast('❌ Failed to load Excel file. Try CSV format.', 4000);
+        showLoading(false);
       }
     }
 
-    function parseCSV(t) {
-      tableData = t.trim().split(/\r?\n/).map(r =>
-        r.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/)
-          .map(c => c.replace(/^"|"$/g, '')));
-      renderTable(tableData); controls.style.display = 'flex'
+    // ----- LOAD CSV -----
+    function loadCSV(text) {
+      try {
+        showLoading(true);
+        
+        // Parse CSV properly
+        const lines = text.trim().split(/\r?\n/);
+        tableData = lines.map(line => {
+          // Handle quoted commas
+          const row = [];
+          let inQuote = false;
+          let currentCell = '';
+          
+          for (let i = 0; i < line.length; i++) {
+            const char = line[i];
+            
+            if (char === '"') {
+              inQuote = !inQuote;
+            } else if (char === ',' && !inQuote) {
+              row.push(currentCell.replace(/^"|"$/g, '').trim());
+              currentCell = '';
+            } else {
+              currentCell += char;
+            }
+          }
+          row.push(currentCell.replace(/^"|"$/g, '').trim());
+          return row;
+        });
+        
+        currentMergedCells = []; // No merged cells in CSV
+        currentCellStyles = {}; // No styles in CSV
+        currentWorksheet = null;
+        renderTable(tableData);
+        controls.style.display = 'flex';
+        showToast(`✅ CSV loaded - ${tableData.length} rows`);
+        showLoading(false);
+      } catch (err) {
+        showToast('❌ Error parsing CSV', 3000);
+        showLoading(false);
+      }
     }
 
-    function loadExcelHTML(html) {
-      const d = document.createElement('div'); d.innerHTML = html;
-      tableData = [...d.querySelectorAll('tr')].map(tr =>
-        [...tr.querySelectorAll('td,th')].map(td => td.innerText));
-      renderTable(tableData); controls.style.display = 'flex'
+    // ----- HELPER: GET CELL STYLES FROM EXCEL -----
+    function getCellStylesCSS(rowIdx, colIdx) {
+      if (!currentWorksheet) return '';
+      
+      const cellAddr = XLSX.utils.encode_cell({ r: rowIdx - 1, c: colIdx });
+      const cell = currentWorksheet[cellAddr];
+      
+      if (!cell || !cell.s) return '';
+      
+      const style = cell.s;
+      let css = '';
+      
+      // Background color
+      if (style.fgColor && style.fgColor.rgb) {
+        css += `background-color: #${style.fgColor.rgb.substring(2)};`;
+      } else if (style.bgColor && style.bgColor.rgb) {
+        css += `background-color: #${style.bgColor.rgb.substring(2)};`;
+      }
+      
+      // Font properties
+      if (style.font) {
+        if (style.font.bold) css += 'font-weight: bold;';
+        if (style.font.italic) css += 'font-style: italic;';
+        if (style.font.color && style.font.color.rgb) {
+          css += `color: #${style.font.color.rgb.substring(2)};`;
+        }
+        if (style.font.sz) {
+          css += `font-size: ${style.font.sz}px;`;
+        }
+        if (style.font.name) {
+          css += `font-family: ${style.font.name};`;
+        }
+      }
+      
+      // Alignment
+      if (style.alignment) {
+        if (style.alignment.horizontal) {
+          css += `text-align: ${style.alignment.horizontal};`;
+        }
+        if (style.alignment.vertical) {
+          const vAlign = style.alignment.vertical;
+          if (vAlign === 'top') css += 'vertical-align: top;';
+          else if (vAlign === 'center') css += 'vertical-align: middle;';
+          else if (vAlign === 'bottom') css += 'vertical-align: bottom;';
+        }
+      }
+      
+      // Borders
+      if (style.border) {
+        const borderStyle = (border) => {
+          if (!border || !border.style) return '';
+          const color = border.color && border.color.rgb ? `#${border.color.rgb.substring(2)}` : '#000';
+          return `1px solid ${color}`;
+        };
+        
+        if (style.border.top) css += `border-top: ${borderStyle(style.border.top)};`;
+        if (style.border.bottom) css += `border-bottom: ${borderStyle(style.border.bottom)};`;
+        if (style.border.left) css += `border-left: ${borderStyle(style.border.left)};`;
+        if (style.border.right) css += `border-right: ${borderStyle(style.border.right)};`;
+      }
+      
+      return css;
     }
 
-    function renderTable(data) {
-      let h = '<table><thead><tr>';
-      data[0].forEach(c => h += `<th>${esc(c)}</th>`);
-      h += '</tr></thead><tbody>';
-      data.slice(1).forEach((r, i) => {
-        h += '<tr>';
-        r.forEach((c, j) => h += `<td contenteditable oninput="tableData[${i + 1}][${j}]=this.innerText">${esc(c)}</td>`);
-        h += '</tr>';
-      });
-      h += '</tbody></table>'; tableWrap.innerHTML = h
+    // ----- RENDER WITH MERGED CELL SUPPORT -----
+    function renderTable(data, mergedCells = []) {
+      if (!data || data.length === 0) {
+        tableWrap.innerHTML = '<div class="empty-state"><svg class="icon" viewBox="0 0 24 24" width="40" height="40"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"/></svg><p><strong>No data</strong></p></div>';
+        return;
+      }
+
+      // Apply filter
+      let displayData = data;
+      if (currentFilter) {
+        displayData = [data[0], ...data.slice(1).filter(r => 
+          r.join(' ').toLowerCase().includes(currentFilter)
+        )];
+      }
+
+      // Build HTML
+      let html = '<table><thead><tr>';
+      
+      // Header row
+      for (let i = 0; i < displayData[0].length; i++) {
+        const headerStyle = getCellStylesCSS(0, i);
+        html += `<th ${headerStyle ? `style="${headerStyle}"` : ''}>${escapeHTML(displayData[0][i] || `Column ${i+1}`)}</th>`;
+      }
+      html += '</tr></thead><tbody>';
+      
+      // Track rendered cells
+      const rendered = Array(displayData.length).fill().map(() => Array(displayData[0].length).fill(false));
+      
+      for (let i = 1; i < displayData.length; i++) {
+        html += '<tr>';
+        for (let j = 0; j < displayData[0].length; j++) {
+          if (rendered[i][j]) continue;
+          
+          let colspan = 1;
+          let rowspan = 1;
+          let value = displayData[i]?.[j] !== undefined && displayData[i]?.[j] !== null ? displayData[i][j] : '';
+          
+          // Check merged cells
+          for (let merge of mergedCells) {
+            if (merge.s.r === i-1 && merge.s.c === j) {
+              colspan = merge.e.c - merge.s.c + 1;
+              rowspan = merge.e.r - merge.s.r + 1;
+              
+              for (let r = 0; r < rowspan; r++) {
+                for (let c = 0; c < colspan; c++) {
+                  if (i + r < displayData.length && j + c < displayData[0].length) {
+                    rendered[i + r][j + c] = true;
+                  }
+                }
+              }
+              break;
+            }
+          }
+          
+          if (colspan === 1 && rowspan === 1) {
+            rendered[i][j] = true;
+          }
+          
+          // Get Excel cell styles
+          const cellStyle = getCellStylesCSS(i, j);
+          
+          html += `<td contenteditable 
+                    oninput="updateCell(${i}, ${j}, this.innerText)"
+                    ${cellStyle ? `style="${cellStyle}"` : ''}
+                    ${colspan > 1 ? `colspan="${colspan}"` : ''}
+                    ${rowspan > 1 ? `rowspan="${rowspan}"` : ''}>${escapeHTML(value)}</td>`;
+        }
+        html += '</tr>';
+      }
+      html += '</tbody></table>';
+      
+      tableWrap.innerHTML = html;
     }
 
+    // ----- UPDATE CELL -----
+    window.updateCell = function(rowIdx, colIdx, val) {
+      if (!tableData[rowIdx]) tableData[rowIdx] = [];
+      tableData[rowIdx][colIdx] = val;
+    };
+
+    // ----- ESCAPE HTML -----
+    function escapeHTML(s) {
+      if (s === undefined || s === null) return '';
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    // ----- SEARCH -----
+    let searchTimer;
     searchInput.oninput = () => {
-      const q = searchInput.value.toLowerCase();
-      renderTable([tableData[0], ...tableData.slice(1).filter(r => r.join(' ').toLowerCase().includes(q))])
-    }
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(() => {
+        currentFilter = searchInput.value.toLowerCase();
+        if (tableData.length) renderTable(tableData, currentMergedCells);
+      }, 200);
+    };
 
-    function exportCSV() {
-      const csv = tableData.map(r => r.map(c => `"${c.replace(/"/g, '""')}"`).join(',')).join('\n');
-      download(csv, 'edited.csv', 'text/csv')
-    }
-    function exportExcel() {
-      const html = `<table>${tableData.map(r => '<tr>' + r.map(c => `<td>${c}</td>`).join('') + '</tr>').join('')}</table>`;
-      download(html, 'edited.xls', 'application/vnd.ms-excel')
-    }
-    function exportPDF() {
-      const w = window.open('');
-      w.document.write(`<html><head><style>
-                        table{width:100%;border-collapse:collapse;font-size:10px}
-                        td,th{border:1px solid #000;padding:4px}
-                        @page{size:A4 landscape;margin:10mm}
-                        </style></head><body>${tableWrap.innerHTML}</body></html>`);
-      w.document.close(); setTimeout(() => w.print(), 500)
-    }
-    function download(d, n, t) {
+    // ----- EXPORT TO XLSX -----
+    window.exportXLSX = function() {
+      if (!tableData.length) return showToast('❌ No data to export', 1500);
+      
+      try {
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.aoa_to_sheet(tableData);
+        
+        if (currentMergedCells && currentMergedCells.length > 0) {
+          ws['!merges'] = currentMergedCells;
+        }
+        
+        XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+        XLSX.writeFile(wb, 'edited.xlsx');
+        showToast('⬇️ XLSX exported successfully');
+      } catch (err) {
+        console.error(err);
+        showToast('❌ Export failed', 1500);
+      }
+    };
+
+    // ----- EXPORT CSV -----
+    window.exportCSV = function() {
+      if (!tableData.length) return showToast('❌ No data to export', 1500);
+      
+      try {
+        const ws = XLSX.utils.aoa_to_sheet(tableData);
+        const csv = XLSX.utils.sheet_to_csv(ws);
+        download(csv, 'edited.csv', 'text/csv');
+        showToast('⬇️ CSV exported');
+      } catch (err) {
+        showToast('❌ Export failed', 1500);
+      }
+    };
+
+    // ----- EXPORT PDF (direct download, no print dialog) -----
+    window.exportPDF = async function() {
+      if (!tableData.length) return showToast('❌ No data to export', 1500);
+
+      showToast('⏳ Generating PDF…', 4000);
+
+      try {
+        const { jsPDF } = window.jspdf;
+
+        // Rebuild a clean flat table (no sticky/overflow) to avoid html2canvas bugs
+        const tableEl = tableWrap.querySelector('table');
+        if (!tableEl) return showToast('❌ No table found', 1500);
+
+        // Clone and strip sticky positioning from thead
+        const clone = tableEl.cloneNode(true);
+        const cloneThead = clone.querySelector('thead');
+        if (cloneThead) {
+          cloneThead.style.position = 'static';
+          cloneThead.style.top = 'auto';
+          cloneThead.style.zIndex = 'auto';
+        }
+        // Make all th/td wrap so nothing is clipped
+        clone.querySelectorAll('th, td').forEach(cell => {
+          cell.style.whiteSpace = 'normal';
+          cell.removeAttribute('contenteditable');
+        });
+
+        // Off-screen container — wide enough for landscape A4 at ~96dpi
+        const container = document.createElement('div');
+        container.style.cssText = [
+          'position:fixed',
+          'top:-99999px',
+          'left:-99999px',
+          'background:#ffffff',
+          'color:#000000',
+          'font-family:system-ui,sans-serif',
+          'padding:16px',
+          'width:1123px',   // ~A4 landscape pixel width at 96dpi
+          'overflow:visible'
+        ].join(';');
+
+        // Inject print-clean styles into the clone
+        const style = document.createElement('style');
+        style.textContent = `
+          table { border-collapse:collapse; width:100%; font-size:10px; table-layout:auto; }
+          thead { position:static !important; top:auto !important; }
+          th { background:#f0f0f0 !important; font-weight:700; border:1px solid #555; padding:5px 6px; color:#000 !important; }
+          td { border:1px solid #aaa; padding:4px 6px; color:#000 !important; background:#fff !important; }
+        `;
+        container.appendChild(style);
+        container.appendChild(clone);
+        document.body.appendChild(container);
+
+        // Wait a tick so layout settles
+        await new Promise(r => setTimeout(r, 80));
+
+        const canvas = await html2canvas(container, {
+          scale: 2,
+          useCORS: true,
+          backgroundColor: '#ffffff',
+          logging: false,
+          scrollX: 0,
+          scrollY: 0
+        });
+
+        document.body.removeChild(container);
+
+        // Fit image into A4 landscape (297 × 210 mm)
+        const PAGE_W = 297;
+        const PAGE_H = 210;
+        const imgW = PAGE_W;
+        const imgH = (canvas.height / canvas.width) * imgW;
+
+        // If content is taller than one page, use portrait or multi-page
+        const useLandscape = imgH <= PAGE_H || imgW >= imgH;
+        const pdf = new jsPDF({
+          orientation: useLandscape ? 'landscape' : 'portrait',
+          unit: 'mm',
+          format: 'a4'
+        });
+
+        const pageW = pdf.internal.pageSize.getWidth();
+        const pageH = pdf.internal.pageSize.getHeight();
+        const ratio = canvas.width / canvas.height;
+        const fitW = pageW;
+        const fitH = fitW / ratio;
+
+        if (fitH <= pageH) {
+          // Fits in one page
+          pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, fitW, fitH, '', 'FAST');
+        } else {
+          // Multi-page: slice canvas into page-height chunks
+          const pageCanvas = document.createElement('canvas');
+          pageCanvas.width = canvas.width;
+          const sliceH = Math.floor((pageH / fitW) * canvas.width); // pixels per page slice
+          pageCanvas.height = sliceH;
+          const ctx = pageCanvas.getContext('2d');
+          let y = 0;
+          let pageNum = 0;
+          while (y < canvas.height) {
+            ctx.clearRect(0, 0, pageCanvas.width, pageCanvas.height);
+            ctx.drawImage(canvas, 0, y, canvas.width, sliceH, 0, 0, canvas.width, sliceH);
+            if (pageNum > 0) pdf.addPage();
+            pdf.addImage(pageCanvas.toDataURL('image/png'), 'PNG', 0, 0, fitW, pageH, '', 'FAST');
+            y += sliceH;
+            pageNum++;
+          }
+        }
+
+        // Use blob URL + anchor click — works on both desktop and mobile browsers
+        const blob = pdf.output('blob');
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'exported.pdf';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 5000);
+
+        showToast('✅ PDF downloaded!');
+      } catch (err) {
+        console.error('PDF export error:', err);
+        showToast('❌ PDF export failed', 2500);
+      }
+    };
+
+    // ----- DOWNLOAD HELPER -----
+    function download(data, name, mime) {
       const a = document.createElement('a');
-      a.href = URL.createObjectURL(new Blob([d], { type: t }));
-      a.download = n; a.click()
+      a.href = URL.createObjectURL(new Blob([data], { type: mime }));
+      a.download = name;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 100);
     }
-    function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') }
 
-
-    // ===== PWA INSTALLATION =====
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("service-worker.js");
+    // ----- FILE LOADING -----
+    async function loadFile(file) {
+      const ext = file.name.split('.').pop().toLowerCase();
+      
+      try {
+        if (ext === 'xlsx' || ext === 'xls') {
+          showToast('📊 Reading Excel file...', 2000);
+          const buffer = await file.arrayBuffer();
+          await loadExcelFile(buffer);
+        } else if (ext === 'csv') {
+          const text = await file.text();
+          loadCSV(text);
+        } else {
+          showToast('❌ Please use .csv, .xls or .xlsx files', 3000);
+        }
+      } catch (err) {
+        console.error(err);
+        showToast('❌ Error loading file', 2000);
+        showLoading(false);
+      }
     }
-    let deferredPrompt;
-    const installBtn = document.getElementById("installBtn");
 
-    window.addEventListener("beforeinstallprompt", e => {
+    // ----- EVENT LISTENERS -----
+    uploadBox.onclick = () => fileInput.click();
+    fileInput.onchange = e => e.target.files[0] && loadFile(e.target.files[0]);
+
+    uploadBox.ondragover = e => { e.preventDefault(); uploadBox.style.borderColor = 'var(--accent2)'; };
+    uploadBox.ondragleave = () => uploadBox.style.borderColor = 'var(--upload-dash)';
+    uploadBox.ondrop = e => {
       e.preventDefault();
-      deferredPrompt = e;
-      installBtn.hidden = false;
-    });
+      uploadBox.style.borderColor = 'var(--upload-dash)';
+      if (e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]);
+    };
 
-    installBtn.addEventListener("click", async () => {
-      deferredPrompt.prompt();
-      await deferredPrompt.userChoice;
-      deferredPrompt = null;
-      installBtn.hidden = true;
-    });
+    // First edit hint
+    document.addEventListener('input', e => {
+      if (e.target.matches('td[contenteditable]') && !window.editHintShown) {
+        showToast('✏️ Cell updated - changes are saved');
+        window.editHintShown = true;
+      }
+    }, { once: true });
+
+    // Expose functions globally
+    window.exportXLSX = window.exportXLSX;
+    window.exportCSV = window.exportCSV;
+    window.exportPDF = window.exportPDF;
   </script>
 </body>
 
