@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CSV to SQL Converter Online Free</title>
+<meta name="description" content="Convert CSV files into SQL INSERT statements instantly. Free browser-based CSV to SQL converter with no uploads.">
+<meta name="keywords" content="csv to sql converter, csv to mysql, csv to sql online, csv insert statement generator">
+<meta name="robots" content="index,follow">
+<link rel="canonical" href="https://yourusername.github.io/csv-to-sql/">
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f4f6f8;color:#222}
+.container{max-width:1100px;margin:auto;padding:20px}
+.card{background:#fff;border-radius:12px;padding:20px;box-shadow:0 4px 18px rgba(0,0,0,.08);margin-bottom:20px}
+h1,h2{margin-top:0} textarea,input{width:100%;padding:12px;border:1px solid #ccc;border-radius:8px}
+textarea{height:220px;resize:vertical}
+button{background:#111827;color:#fff;border:none;padding:12px 18px;border-radius:8px;cursor:pointer}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+pre{background:#0f172a;color:#e2e8f0;padding:15px;border-radius:8px;overflow:auto;max-height:450px}
+.drop{border:2px dashed #bbb;padding:30px;text-align:center;border-radius:10px;cursor:pointer;margin-bottom:15px}
+table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:8px}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="card">
+<h1>CSV to SQL Converter</h1>
+<p>Convert CSV data into SQL INSERT statements directly in your browser.</p>
+
+<div class="drop" id="drop">Drop CSV File Here or Click to Upload</div>
+<input type="file" id="file" accept=".csv" hidden>
+
+<label><strong>Table Name</strong></label>
+<input id="tableName" value="my_table">
+
+<br><br>
+<label><strong>CSV Input</strong></label>
+<textarea id="csvInput" placeholder="id,name,email&#10;1,John,john@example.com"></textarea>
+
+<div class="actions">
+<button onclick="convertCSV()">Convert to SQL</button>
+<button onclick="copySQL()">Copy SQL</button>
+<button onclick="downloadSQL()">Download SQL</button>
+</div>
+</div>
+
+<div class="card">
+<h2>Generated SQL</h2>
+<pre id="output">SQL output will appear here...</pre>
+</div>
+
+<div class="card">
+<h2>What is CSV to SQL Conversion?</h2>
+<p>CSV to SQL conversion transforms spreadsheet-style data into SQL INSERT statements that can be imported into MySQL, MariaDB, PostgreSQL, SQLite and other database systems.</p>
+</div>
+
+<div class="card">
+<h2>Frequently Asked Questions</h2>
+<p><strong>Is this tool free?</strong><br>Yes.</p>
+<p><strong>Is my data uploaded?</strong><br>No. Everything runs locally in your browser.</p>
+<p><strong>Can I use it with MySQL?</strong><br>Yes, generated INSERT statements are MySQL-compatible.</p>
+</div>
+</div>
+
+<script>
+const drop=document.getElementById('drop');
+const file=document.getElementById('file');
+
+drop.onclick=()=>file.click();
+
+file.onchange=e=>{
+const f=e.target.files[0];
+if(!f)return;
+const r=new FileReader();
+r.onload=x=>document.getElementById('csvInput').value=x.target.result;
+r.readAsText(f);
+};
+
+drop.addEventListener('dragover',e=>e.preventDefault());
+drop.addEventListener('drop',e=>{
+e.preventDefault();
+const f=e.dataTransfer.files[0];
+if(!f)return;
+const r=new FileReader();
+r.onload=x=>document.getElementById('csvInput').value=x.target.result;
+r.readAsText(f);
+});
+
+function parseCSV(text){
+const lines=text.trim().split(/\r?\n/);
+return lines.map(line=>line.split(','));
+}
+
+function convertCSV(){
+const csv=document.getElementById('csvInput').value.trim();
+const table=document.getElementById('tableName').value.trim()||'my_table';
+
+if(!csv){
+alert('Please provide CSV data');
+return;
+}
+
+const rows=parseCSV(csv);
+const headers=rows[0];
+
+let sql='';
+
+for(let i=1;i<rows.length;i++){
+const values=rows[i].map(v=>"'"+String(v).replace(/'/g,"''")+"'");
+sql+=`INSERT INTO ${table} (${headers.join(', ')}) VALUES (${values.join(', ')});\n`;
+}
+
+document.getElementById('output').textContent=sql;
+}
+
+function copySQL(){
+navigator.clipboard.writeText(document.getElementById('output').textContent);
+}
+
+function downloadSQL(){
+const text=document.getElementById('output').textContent;
+const blob=new Blob([text],{type:'text/sql'});
+const a=document.createElement('a');
+a.href=URL.createObjectURL(blob);
+a.download='output.sql';
+a.click();
+}
+</script>
+</body>
+</html>
