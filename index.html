@@ -57,32 +57,139 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
   <!-- ===== STRUCTURED DATA ===== -->
-  <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "WebApplication",
-  "name": "Online CSV Viewer & Editor",
-  "description": "A web-based tool to safely open, view, and analyze CSV data completely within your browser.",
-  "applicationCategory": "Utilities",
-  "operatingSystem": "All",
-  "browserRequirements": "JavaScript enabled",
-  "offers": {
-    "@type": "Offer",
-    "price": "0",
-    "priceCurrency": "USD"
+ <script type="application/ld+json">
+[
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "CSV Viewer Online",
+    "url": "https://csv-viewer.github.io/",
+    "description": "Free online CSV viewer and editor. Open, edit and convert CSV files to Excel, CSV or PDF. 100% client-side, private and secure. Supports old Excel .xls files.",
+    "applicationCategory": "UtilitiesApplication",
+    "operatingSystem": "Any",
+    "browserRequirements": "Requires a modern web browser with JavaScript enabled",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "featureList": [
+      "View CSV files online",
+      "Edit CSV files in browser",
+      "Export to PDF, CSV and Excel",
+      "100% client-side",
+      "Supports merged cells and formatting",
+      "Works offline as a PWA"
+    ],
+    "screenshot": "https://csv-viewer.github.io/assets/csv-viewer-preview.png",
+    "image": "https://csv-viewer.github.io/assets/csv-viewer-preview.png",
+    "publisher": {
+      "@type": "Organization",
+      "name": "CSV Viewer Online",
+      "url": "https://csv-viewer.github.io/"
+    },
+    "inLanguage": "en",
+    "isAccessibleForFree": true
   },
-  "featureList": [
-    "view csv online",
-    "online csv viewer",
-    "CSV editing",
-    "XLS (old Excel) support",
-    "XLSX viewing and editing",
-    "Merged cells support",
-    "Export to XLSX",
-    "Export to PDF",
-    "Dark mode"
-  ]
-}
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Is it safe to open a CSV file in an online viewer?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes — as long as the tool processes the file locally in your browser and does not upload it to a server. CSV Viewer Online at csv-viewer.github.io does all parsing on your device. Nothing is transmitted."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Do I need to install software to open a CSV file?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No. This free web application lets you drag and drop any .csv file to read its contents instantly in an organized table layout — no download or installation needed."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I edit my CSV file online?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. Double-click any cell to edit it, then export the modified file as CSV, XLSX or PDF"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does it work with large CSV files?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Browser-based CSV viewers handle files with tens of thousands of rows comfortably. Very large files (millions of rows) may be slower depending on your device RAM."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I open XLS and XLSX files, not just CSV?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. This CSV viewer also opens old .xls (Excel 97-2003) and modern .xlsx Excel files, preserving merged cells and cell formatting."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does it work offline?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Once the page has loaded, the tool works without an internet connection. You can even install it as a PWA (Progressive Web App) from Chrome or Edge for a native-app-like experience."
+        }
+      }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": "How to view a CSV file online",
+    "description": "Open and view any CSV, XLS or XLSX file in your browser in seconds — no installation needed.",
+    "totalTime": "PT10S",
+    "tool": {
+      "@type": "HowToTool",
+      "name": "CSV Viewer Online",
+      "url": "https://csv-viewer.github.io/"
+    },
+    "step": [
+      {
+        "@type": "HowToStep",
+        "position": 1,
+        "name": "Open the tool",
+        "text": "Go to csv-viewer.github.io in any browser."
+      },
+      {
+        "@type": "HowToStep",
+        "position": 2,
+        "name": "Load your file",
+        "text": "Drag and drop your .csv, .xls, or .xlsx file onto the upload area, or click to browse your files."
+      },
+      {
+        "@type": "HowToStep",
+        "position": 3,
+        "name": "View your data",
+        "text": "Your data loads instantly as a clean, formatted table with sortable columns and a search bar."
+      },
+      {
+        "@type": "HowToStep",
+        "position": 4,
+        "name": "Edit if needed",
+        "text": "Click any cell to edit it directly in the table."
+      },
+      {
+        "@type": "HowToStep",
+        "position": 5,
+        "name": "Export",
+        "text": "Export your file as CSV, XLSX, or PDF with a single click."
+      }
+    ]
+  }
+]
 </script>
 
   <!-- ===== SHEETJS FOR BOTH XLSX AND OLD XLS ===== -->
