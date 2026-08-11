@@ -526,6 +526,18 @@
   .who-desc { color: #6b7280; font-size: 12px; line-height: 1.5; }
   .intro-note { background: #eff6ff; border-left: 3px solid #2563eb; border-radius: 0 6px 6px 0; padding: 12px 16px; margin: 1rem 0; font-size: 14px; line-height: 1.7; }
   .no-signup { font-size: 13px; color: #6b7280; }
+    .faq-section { max-width: 800px; margin: 20px auto; padding: 15px; font-family: inherit; }
+  .faq-section h2 { font-size: 22px; font-weight: 500; margin: 0 0 1.5rem; }
+  .faq-list { display: flex; flex-direction: column; gap: 0; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; }
+  .faq-item { border-bottom: 1px solid #e5e7eb; }
+  .faq-item:last-child { border-bottom: none; }
+  .faq-question { width: 100%; background: none; border: none; text-align: left; padding: 16px 20px; font-size: 15px; font-weight: 500; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 12px; color: inherit; font-family: inherit; }
+  .faq-question:hover { background: #f9fafb; }
+  .faq-icon { flex-shrink: 0; width: 20px; height: 20px; border-radius: 50%; background: #eff6ff; color: #2563eb; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 400; line-height: 1; transition: transform 0.2s; }
+  .faq-item.open .faq-icon { transform: rotate(45deg); }
+  .faq-answer { display: none; padding: 0 20px 16px; font-size: 14px; line-height: 1.75; color: #6b7280; }
+  .faq-item.open .faq-answer { display: block; }
+  .faq-item.open .faq-question { color: #2563eb; }
   </style>
 </head>
 
@@ -749,44 +761,72 @@
 </div>
 
     
-<section id="faq-section" style="max-width: 800px; margin: 20px auto; padding: 15px;">
-  <h2>Frequently Asked Questions</h2>
-<br>
-  <div class="faq-item">
-    <h3>Is it safe to open a CSV file in an online viewer?</h3>
-    <p>Yes — as long as the tool processes the file locally in your browser and doesn't upload it to a server. CSV Viewer Online at csv-viewer.github.io does all parsing on your device. Nothing is transmitted.</p>
+<section class="faq-section" id="faq-section">
+  <h2>Frequently asked questions</h2>
+ 
+  <div class="faq-list">
+ 
+    <div class="faq-item open">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        Is it safe to open a CSV file in an online viewer?
+        <span class="faq-icon">+</span>
+      </button>
+      <div class="faq-answer">
+        Yes — as long as the tool processes the file locally in your browser and doesn't upload it to a server. CSV Viewer Online at csv-viewer.github.io does all parsing on your device. Nothing is transmitted.
+      </div>
+    </div>
+ 
+    <div class="faq-item">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        Do I need to install software to open a CSV file?
+        <span class="faq-icon">+</span>
+      </button>
+      <div class="faq-answer">
+        No. This free web application lets you drag and drop any <code style="font-family:monospace;font-size:13px;background:#f3f4f6;border:1px solid #e5e7eb;padding:1px 6px;border-radius:4px;">.csv</code> file to read its contents instantly in an organized table layout — no download or installation needed.
+      </div>
+    </div>
+ 
+    <div class="faq-item">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        Can I edit my CSV file online?
+        <span class="faq-icon">+</span>
+      </button>
+      <div class="faq-answer">
+        Yes. Double-click any cell to edit it, then export the modified file as CSV or XLSX.
+      </div>
+    </div>
+ 
+    <div class="faq-item">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        Does it work with large CSV files?
+        <span class="faq-icon">+</span>
+      </button>
+      <div class="faq-answer">
+        Browser-based CSV viewers handle files with tens of thousands of rows comfortably. Very large files (millions of rows) may be slower depending on your device RAM.
+      </div>
+    </div>
+ 
+    <div class="faq-item">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        Can I open XLS and XLSX files, not just CSV?
+        <span class="faq-icon">+</span>
+      </button>
+      <div class="faq-answer">
+        Yes. This CSV viewer also opens old <code style="font-family:monospace;font-size:13px;background:#f3f4f6;border:1px solid #e5e7eb;padding:1px 6px;border-radius:4px;">.xls</code> and modern <code style="font-family:monospace;font-size:13px;background:#f3f4f6;border:1px solid #e5e7eb;padding:1px 6px;border-radius:4px;">.xlsx</code> Excel files, preserving merged cells and cell formatting.
+      </div>
+    </div>
+ 
+    <div class="faq-item">
+      <button class="faq-question" onclick="toggleFaq(this)">
+        Does it work offline?
+        <span class="faq-icon">+</span>
+      </button>
+      <div class="faq-answer">
+        Once the page has loaded, the tool works without an internet connection. You can even install it as a PWA (Progressive Web App) from Chrome or Edge for a native-app-like experience.
+      </div>
+    </div>
+ 
   </div>
-<br>
-  <div class="faq-item">
-    <h3>Do I need to install software to open a CSV file?</h3>
-    <p>No, you do not need to download or install any external software. This free web application allows you to drag and drop any comma-separated values (.csv) document to read its contents instantly in an organized data table layout.</p>
-  </div>
-
-  <div class="faq-item">
-    <h3>Can I edit my CSV file online?</h3>
-    <p> Yes. You can double-click any cell to edit it, then export the modified file as CSV or XLSX.</p>
-    
-  </div>
-
-  <div class="faq-item">
-    <h3>Does it work with large CSV files?</h3>
-    <p>Browser-based CSV viewers handle files with tens of thousands of rows comfortably. Very large files (millions of rows) may be slower depending on your device RAM.</p>
-    
-  </div>
-
-  <div class="faq-item">
-    <h3>Can I open XLS and XLSX files, not just CSV?</h3>
-    <p>Yes. This CSV viewer online also opens old .xls and modern .xlsx Excel files, preserving merged cells and cell formatting.</p>
-    
-  </div>
-
-  <div class="faq-item">
-    <h3>Does it work offline?</h3>
-    <p>Once the page has loaded, the tool works without an internet connection. You can even install it as a PWA (Progressive Web App) from Chrome or Edge for a native-app-like experience.</p>
-    
-  </div>
-
-  
 </section>
 
       
