@@ -844,6 +844,13 @@
     const lightBtn = document.getElementById('themeLightBtn');
     const darkBtn = document.getElementById('themeDarkBtn');
 
+    function toggleFaq(btn) {
+    var item = btn.closest('.faq-item');
+    var isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item.open').forEach(function(el) { el.classList.remove('open'); });
+    if (!isOpen) item.classList.add('open');
+  }
+
     function setTheme(theme, save = true) {
       if (theme === 'dark') {
         root.setAttribute('data-theme', 'dark');
